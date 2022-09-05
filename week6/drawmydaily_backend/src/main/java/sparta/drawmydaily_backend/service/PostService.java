@@ -12,7 +12,7 @@ import sparta.drawmydaily_backend.controller.response.ResponseDto;
 import sparta.drawmydaily_backend.domain.Comment;
 import sparta.drawmydaily_backend.domain.ImageMapper;
 import sparta.drawmydaily_backend.domain.Post;
-import sparta.drawmydaily_backend.domain.User;
+import sparta.drawmydaily_backend.domain.Users;
 import sparta.drawmydaily_backend.jwt.TokenProvider;
 import sparta.drawmydaily_backend.repository.CommentRepository;
 import sparta.drawmydaily_backend.repository.ImageMapperRepository;
@@ -34,11 +34,19 @@ public class PostService {
 
     @Transactional
     public ResponseDto<?> createPost(PostRequestDto requestDto, HttpServletRequest request) {
+        if (null == request.getHeader("Refresh-Token")) {
+            return ResponseDto.fail("MEMBER_NOT_FOUND",
+                    "로그인이 필요합니다.");
+        }
 
+        if (null == request.getHeader("Authorization")) {
+            return ResponseDto.fail("MEMBER_NOT_FOUND",
+                    "로그인이 필요합니다.");
+        }
+        //로그인된 회원인지 확인
 
-        //로그인된 회원인지 확인, 오류 처리
-        User user = validateUser(request);
-        if (null == user){
+        Users users = validateUser(request);
+        if (null == users){
             return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
         } //user가 유효한지 확인 = 로그인된 회원 확인
 
@@ -53,7 +61,7 @@ public class PostService {
                 .content(requestDto.getContent())
                 .sayMe(requestDto.getSayMe())
                 .image(findImage.get())
-                .user(user)   //-> 로그인한 회원 정보 유효한지 확인 후 작성자
+                .users(users)   //-> 로그인한 회원 정보 유효한지 확인 후 작성자
                 .build();
         postRepository.save(post); //게시글 작성후 repostory 저장
         return ResponseDto.success(
@@ -61,7 +69,7 @@ public class PostService {
                         .id(post.getId())
                         .title(post.getTitle())
                         .date(post.getDate())
-                        .user_name(post.getUser().getName())
+                        .user_name(post.getUsers().getName())
                         .content(post.getContent())
                         .sayMe(post.getSayMe())
                         .image(post.getImage().getUrl())    //이미지는 url로 전달
@@ -82,7 +90,7 @@ public class PostService {
                     .id(post.getId())
                     .title(post.getTitle())
                     .date(post.getDate())
-                    .user_name(post.getUser().getName())
+                    .user_name(post.getUsers().getName())
                     .sayme(post.getSayMe())
                     .image(post.getImage().getUrl())
                     .createdAt(post.getCreatedAt())
@@ -108,7 +116,7 @@ public class PostService {
             commentResponseDtoList.add(
                     CommentResponseDto.builder()
                             .id(comment.getId())
-                            .user_name(comment.getUser().getName())
+                            .user_name(comment.getUsers().getName())
                             .content(comment.getContent())
                             .createdAt(comment.getCreatedAt())
                             .modifiedAt(comment.getModifiedAt())
@@ -121,7 +129,7 @@ public class PostService {
                         .id(post.getId())
                         .title(post.getTitle())
                         .date(post.getDate())
-                        .user_name(post.getUser().getName())
+                        .user_name(post.getUsers().getName())
                         .image(post.getImage().getUrl())
                         .content(post.getContent())
                         .sayMe(post.getSayMe())
@@ -136,11 +144,19 @@ public class PostService {
 
     @Transactional
     public ResponseDto<?> updatePost(Long id, PostRequestDto postRequestDto, MultipartFile file, HttpServletRequest request) {
+        if (null == request.getHeader("Refresh-Token")) {
+            return ResponseDto.fail("MEMBER_NOT_FOUND",
+                    "로그인이 필요합니다.");
+        }
 
-
+        if (null == request.getHeader("Authorization")) {
+            return ResponseDto.fail("MEMBER_NOT_FOUND",
+                    "로그인이 필요합니다.");
+        }
         //로그인된 회원인지 확인, 오류 처리
-        User user = validateUser(request);
-        if (null == user){
+
+        Users users = validateUser(request);
+        if (null == users){
             return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
         } //user가 유효한지 확인 = 로그인된 회원 확인
 
@@ -149,7 +165,7 @@ public class PostService {
             return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
         } //해당 id의 게시글 없으면 오류 발생
 
-        if (post.validateUser(user)){
+        if (post.validateUser(users)){
             return ResponseDto.fail("BAD_REQUEST", "해당 글의 작성자만 수정할 수 있습니다.");
         } //해당 id 게시글 작성자 확인
 
@@ -167,11 +183,19 @@ public class PostService {
 
     @Transactional
     public ResponseDto<?> deletePost(Long id, HttpServletRequest request) {
+        if (null == request.getHeader("Refresh-Token")) {
+            return ResponseDto.fail("MEMBER_NOT_FOUND",
+                    "로그인이 필요합니다.");
+        }
 
-
+        if (null == request.getHeader("Authorization")) {
+            return ResponseDto.fail("MEMBER_NOT_FOUND",
+                    "로그인이 필요합니다.");
+        }
         //로그인된 회원인지 확인, 오류 처리
-        User user = validateUser(request);
-        if (null == user){
+
+        Users users = validateUser(request);
+        if (null == users){
             return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
         } //user가 유효한지 확인 = 로그인된 회원 확인
 
@@ -180,7 +204,7 @@ public class PostService {
             return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
         } //해당 id의 게시글 없으면 오류 발생
 
-        if (post.validateUser(user)){
+        if (post.validateUser(users)){
             return ResponseDto.fail("BAD_REQUEST", "해당 글의 작성자만 수정할 수 있습니다.");
         } //해당 id 게시글 작성자 확인
 
@@ -198,12 +222,19 @@ public class PostService {
     //id의 게시글 삭제
 
     public ResponseDto<?> uploadImg(MultipartFile file, HttpServletRequest request) {
+        if (null == request.getHeader("Refresh-Token")) {
+            return ResponseDto.fail("MEMBER_NOT_FOUND",
+                    "로그인이 필요합니다.");
+        }
 
-
+        if (null == request.getHeader("Authorization")) {
+            return ResponseDto.fail("MEMBER_NOT_FOUND",
+                    "로그인이 필요합니다.");
+        }
         //로그인된 회원인지 확인, 오류 처리
 
-        User user = validateUser(request);
-        if(null ==user){
+        Users users = validateUser(request);
+        if(null == users){
             return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
         }
 
@@ -224,10 +255,13 @@ public class PostService {
     //이미지 업로드
 
     @Transactional
-    public User validateUser(HttpServletRequest request) {
-        //유효한 토큰을 준 유저만이 로그인 성공, 리프레시, 권한 토큰 받아와야함
-        //tokenprovider와 jwt 인증 및 인가를 통해 ...
+    public Users validateUser(HttpServletRequest request) {
+        if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
+            return null;
+        }
+        return tokenProvider.getUserFromAuthentication();
     }
+    //token 확인을 통해 로그인 여부 확인
 
     @Transactional(readOnly = true)
    public Post isPresentPost(Long id) {

@@ -56,7 +56,7 @@ public class AmazonS3Service {
 
     @Transactional
     public boolean removeFile(String fileName){
-        Optional<ImageMapper> optionalImageMapper = imageMapperRepository.findByName(fileName);//파일 이름으로 파일 가져오기
+        Optional<ImageMapper> optionalImageMapper = imageMapperRepository.findByImgName(fileName);//파일 이름으로 파일 가져오기
         if (optionalImageMapper.isEmpty())
             return true; //실제 존재하는 파일인지 확인
         ImageMapper image = optionalImageMapper.get();

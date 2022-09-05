@@ -38,16 +38,16 @@ public class Post extends Timestamped{
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments; //댓글리스트
 
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "users_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user; //회원가입 된 유저
+    private Users users; //회원가입 된 유저
 
-    public boolean validateUser(User user) {
-        return !this.user.equals(user);
+    public boolean validateUser(Users users) {
+        return !this.users.equals(users);
     }
     ////작성자 확인
 
-    public void update(PostRequestDto postRequestDto, ImageMapper imageMapper) {
+    public void update(PostRequestDto postRequestDto, ImageMapper image) {
         this.title = postRequestDto.getTitle();
         this.date = postRequestDto.getDate();
         this.image = image;
@@ -66,10 +66,5 @@ public class Post extends Timestamped{
         comment.setPost(this);
     }
     //게시글에 댓글 삭제시 댓글리스트에서 제거
-
-
-
-    //name,
-
 
 }

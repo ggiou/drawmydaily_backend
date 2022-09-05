@@ -21,7 +21,7 @@ public class CommentController {
         return commentService.createComment(requestDto, request);
     }//로그인 된 유저만 댓글 작성 가능 -> detail 페이지
 
-    @RequestMapping(value = "/api/comment/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/comments/{id}", method = RequestMethod.GET)
     public ResponseDto<?> getAllComments(@PathVariable Long id){
         return commentService.getAllCommentsByPost(id);
     }//게시글에 작성된 댓글 모두 가져오기 -> detail 페이지(모두 볼 수 있음)

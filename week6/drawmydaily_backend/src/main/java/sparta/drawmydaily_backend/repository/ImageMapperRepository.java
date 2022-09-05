@@ -6,7 +6,7 @@ import sparta.drawmydaily_backend.domain.ImageMapper;
 import java.util.Optional;
 
 public interface ImageMapperRepository extends JpaRepository<ImageMapper, Long> {
-    Optional<ImageMapper> findByName(String name);
+    Optional<ImageMapper> findByImgName(String imgName);
 
     Optional<ImageMapper> findByUrl(String url);
 }

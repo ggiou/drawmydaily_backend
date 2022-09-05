@@ -19,16 +19,16 @@ public class Comment extends Timestamped{
     @Column(nullable = false)
     private String content; // 댓글 내용
 
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "users_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user; //댓글 작성 자 (회원가입된 유저)
+    private Users users; //댓글 작성 자 (회원가입된 유저)
 
     @JoinColumn(name = "post_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Post post; //작성하는 댓글이 어느 게시글 댓글인지
 
 
-    public boolean validateUser(User user) {
-        return !this.user.equals(user);
+    public boolean validateUser(Users users) {
+        return !this.users.equals(users);
     }
 }

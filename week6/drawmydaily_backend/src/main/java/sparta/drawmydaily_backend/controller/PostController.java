@@ -30,17 +30,17 @@ public class PostController {
         return postService.getAllPost();
     } //게시글 전체 조회 -> Home 페이지(권한 없이도 볼 수 있음)
 
-    @RequestMapping(value = "/api/post/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/posts/{id}", method = RequestMethod.GET)
     public ResponseDto<?> getPost(@PathVariable Long id){
         return postService.getPost(id);
     }//상세 게시글 조회 -> Detail 페이지(권한 없이도 볼 수 있음)
 
-    @RequestMapping(value = "/api/auth/post/{id}", method = RequestMethod.PUT, consumes = {"multipart/form-data"})
+    @RequestMapping(value = "/api/auth/posts/{id}", method = RequestMethod.PUT, consumes = {"multipart/form-data"})
     public ResponseDto<?> updatePost(@PathVariable Long id, @RequestPart("value") PostRequestDto postRequestDto, @RequestPart("file") MultipartFile file, HttpServletRequest request){
         return postService.updatePost(id, postRequestDto, file, request);
     }//해당 글을 작성한 유저만 게시글 수정 -> Detail 페이지(작성자만 수정버튼), add 페이지(아마 그대로 사용?)
 
-    @RequestMapping(value = "/api/auth/post/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/api/auth/posts/{id}", method = RequestMethod.DELETE)
     public ResponseDto<?> deletePost(@PathVariable Long id, HttpServletRequest request){
         return postService.deletePost(id, request);
     }//해당 글을 작성한 유저만 게시글 삭제 -> Detail 페이지(작성자만 삭제버튼)
