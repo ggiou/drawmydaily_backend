@@ -53,7 +53,7 @@ public class PostService {
         Optional<ImageMapper> findImage = imageMapperRepository.findByUrl(requestDto.getImgURL());
         if(findImage.isEmpty())
             return ResponseDto.fail("URL_ERROR", "이미지 URL이 올바르지 않습니다.");
-        //업로드할 이미지 URL을 받아와 유효한지 확인
+        //업로드한 이미지 URL을 받아와 유효한지 확인
 
         Post post = Post.builder()
                 .title(requestDto.getTitle())
