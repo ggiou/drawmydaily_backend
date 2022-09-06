@@ -25,7 +25,7 @@ public class MyPageService {
 
     @Transactional(readOnly = true)
     public ResponseDto<?> getMypage(HttpServletRequest request) {
-        if (null == request.getHeader("Refresh-Token")) {
+        if (null == request.getHeader("RefreshToken")) {
             return ResponseDto.fail("MEMBER_NOT_FOUND",
                     "로그인이 필요합니다.");
         }
@@ -72,7 +72,7 @@ public class MyPageService {
     }
 
     private Users validateUser(HttpServletRequest request) {
-        if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
+        if (!tokenProvider.validateToken(request.getHeader("RefreshToken"))) {
             return null;
         }
         return tokenProvider.getUserFromAuthentication();

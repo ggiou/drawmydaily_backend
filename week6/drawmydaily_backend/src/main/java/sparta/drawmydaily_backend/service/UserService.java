@@ -75,7 +75,7 @@ public class UserService {
     //로그인 -> 유효한 토큰 생성 및 헤더에 추가
 
     public ResponseDto<?> logout(HttpServletRequest request) {
-        if(!tokenProvider.validateToken(request.getHeader("Refresh-Token"))){
+        if(!tokenProvider.validateToken(request.getHeader("RefreshToken"))){
             return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
         }//들여온 토큰이 유효한지 검사
         Users users = tokenProvider.getUserFromAuthentication();
@@ -96,7 +96,7 @@ public class UserService {
 
     private void tokenToHeaders(TokenDto tokenDto, HttpServletResponse response) {
         response.addHeader("Authorization", "Bearer " + tokenDto.getAccessToken()); //access 토큰 헤더 추가
-        response.addHeader("Refresh-Token", tokenDto.getRefreshToken()); //refresh 토큰 헤더 추가
+        response.addHeader("RefreshToken", tokenDto.getRefreshToken()); //refresh 토큰 헤더 추가
         response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString()); //access 토큰 만료 시간 헤어 추가
     }
 }

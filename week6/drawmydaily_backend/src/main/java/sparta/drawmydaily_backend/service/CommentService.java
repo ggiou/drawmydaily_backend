@@ -27,7 +27,7 @@ public class CommentService {
 
     @Transactional
     public ResponseDto<?> createComment(CommentRequestDto requestDto, HttpServletRequest request) {
-        if (null == request.getHeader("Refresh-Token")) {
+        if (null == request.getHeader("RefreshToken")) {
             return ResponseDto.fail("MEMBER_NOT_FOUND",
                     "로그인이 필요합니다.");
         }
@@ -93,7 +93,7 @@ public class CommentService {
 
     @Transactional
     public ResponseDto<?> deleteComment(Long id, HttpServletRequest request) {
-        if (null == request.getHeader("Refresh-Token")) {
+        if (null == request.getHeader("RefreshToken")) {
             return ResponseDto.fail("MEMBER_NOT_FOUND",
                     "로그인이 필요합니다.");
         }
@@ -136,7 +136,7 @@ public class CommentService {
 
     @Transactional
     public Users validateUser(HttpServletRequest request) {
-        if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
+        if (!tokenProvider.validateToken(request.getHeader("RefreshToken"))) {
             return null;
             //유효하지 않는 토큰이면 로그인 x = null 반환
         }
