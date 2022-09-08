@@ -79,5 +79,5 @@ public class SecurityConfiguration {
 
         return http.build();
     }
-
 }
+//시큐리티 사용 (권한 부여 -> 회원만 글 cud를 위해 접근 경로 설정

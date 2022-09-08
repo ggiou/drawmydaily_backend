@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CommentResponseDto {
     private Long id;
+    private Long postId;
     private String user_name;
     private String content;
     private LocalDateTime createdAt; //작성시간

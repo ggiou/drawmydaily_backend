@@ -29,7 +29,7 @@ public class TokenProvider {
     //권한을 주기 위한 key 부여
     private static final String BEARER_PREFIX = "Bearer ";
     //JWT 혹은 OAuth에 대한 토큰을 사용, 토큰 앞에 Bearer 문자열 필요해서 고정
-    private static final long ACCESS_TOKEN_EXPIREE_TIME = 1000 * 60 * 30; //엑세스 토큰 만료  = 30분
+    private static final long ACCESS_TOKEN_EXPIREE_TIME = 1000 * 60 * 60 * 24; //엑세스 토큰 만료  = 30분(현 1일)
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7; //리프레시 토큰 만료  = 7일
 
     private final Key key;

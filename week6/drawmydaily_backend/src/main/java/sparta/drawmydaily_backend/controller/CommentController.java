@@ -26,6 +26,12 @@ public class CommentController {
         return commentService.getAllCommentsByPost(id);
     }//게시글에 작성된 댓글 모두 가져오기 -> detail 페이지(모두 볼 수 있음)
 
+    @RequestMapping(value = "/api/auth/comments/{id}", method = RequestMethod.PUT)
+    public ResponseDto<?> updateComment(@PathVariable Long id, @RequestBody CommentRequestDto requestDto,
+                                        HttpServletRequest request) {
+        return commentService.updateComment(id, requestDto, request);
+    }
+
     @RequestMapping(value = "/api/auth/comments/{id}", method = RequestMethod.DELETE)
     public ResponseDto<?> deleteComment(@PathVariable Long id, HttpServletRequest request){
         return commentService.deleteComment(id, request);
