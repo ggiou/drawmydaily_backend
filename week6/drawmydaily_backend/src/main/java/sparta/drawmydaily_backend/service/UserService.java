@@ -15,6 +15,8 @@ import sparta.drawmydaily_backend.repository.UsersRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -23,7 +25,8 @@ public class UserService {
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder; //비밀번호를 암호화 하는 역할
     private final TokenProvider tokenProvider;
-    
+
+
     @Transactional
     public ResponseDto<?> createUser(UsersRequestDto requestDto) {
         if (null != isPresentUser(requestDto.getName())){
@@ -99,4 +102,22 @@ public class UserService {
         response.addHeader("RefreshToken", tokenDto.getRefreshToken()); //refresh 토큰 헤더 추가
         response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString()); //access 토큰 만료 시간 헤어 추가
     }
+    //token을 뽑아 쓸 수 있도록 headers에 넣어주기
+
+    @Transactional
+    public ResponseDto<?> allUserName() {
+        List<Users> allName = usersRepository.findAll();
+        List<UsersResponseDto> allUserNameList = new ArrayList<>();
+
+        for (Users users : allName){
+            allUserNameList.add(UsersResponseDto.builder()
+                            .id(users.getId())
+                            .name(users.getName())
+                            .createdAt(users.getCreatedAt())
+                            .modifiedAt(users.getModifiedAt())
+                            .build());
+        }
+        return ResponseDto.success(allUserNameList);
+    }
+    //모든 회원의 id 가져오기
 }

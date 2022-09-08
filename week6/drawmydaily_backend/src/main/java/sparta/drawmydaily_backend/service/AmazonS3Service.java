@@ -8,25 +8,27 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import sparta.drawmydaily_backend.controller.response.ResponseDto;
-import sparta.drawmydaily_backend.domain.ImageMapper;
-import sparta.drawmydaily_backend.repository.ImageMapperRepository;
-
+import sparta.drawmydaily_backend.repository.PostRepository;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.UUID;
 
+@Component
 @Service
 @RequiredArgsConstructor
 @Slf4j //CMD에 오류 출력
 public class AmazonS3Service {
-    private final AmazonS3Client amazonS3Client;
-    private final ImageMapperRepository imageMapperRepository;
 
+
+    private final AmazonS3Client amazonS3Client;
+    private final PostRepository postRepository;
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
@@ -46,25 +48,21 @@ public class AmazonS3Service {
         }catch (IOException e){
             return ResponseDto.fail("FILE_UPLOAD_FAIL", "파일 업로드 실패"); //업로드 실패 오류 표시
         }
-        ImageMapper imageMapper = ImageMapper.builder()
-                .url(amazonS3Client.getUrl(bucketName, fileName).toString())
-                .imgName(fileName)
-                .build();
-        imageMapperRepository.save(imageMapper); //이미지 객체 생성 및 repository에 저장
-        return ResponseDto.success(imageMapper);
+        String imageURL= amazonS3Client.getUrl(bucketName, fileName).toString();
+        return ResponseDto.success(imageURL);
     }
 
     @Transactional
-    public boolean removeFile(String fileName){
-        Optional<ImageMapper> optionalImageMapper = imageMapperRepository.findByImgName(fileName);//파일 이름으로 파일 가져오기
-        if (optionalImageMapper.isEmpty())
-            return true; //실제 존재하는 파일인지 확인
-        ImageMapper image = optionalImageMapper.get();
-        imageMapperRepository.deleteById(image.getId()); //imageMapper에서 삭제
-        DeleteObjectRequest request = new DeleteObjectRequest(bucketName, fileName); //삭제 request 생성
-        amazonS3Client.deleteObject(request); //s3에서 파일 삭제
-        return false;
+    public void removeFile(String imageURL) throws IOException {
+        if (postRepository.findByImageURL(imageURL).isEmpty()) {
+            return; //이미지가 이미 없으면 삭제 된 것
+        }
+        String urlFileName = imageURL.substring(46);
+        String imageKey = URLDecoder.decode(urlFileName,"UTF-8"); //한글 인코딩
+        DeleteObjectRequest request = new DeleteObjectRequest(bucketName, imageKey); //삭제 request 생성
+            amazonS3Client.deleteObject(request); //s3에서 파일 삭제
     }//파일 삭제
+
     private String createFileName(String originalFilename) {
         return UUID.randomUUID().toString().concat(originalFilename);
     }//네트워크 상에서 고유성이 보장되는 id를 만들어 줌, 즉 유니크한 파일 이름 생성
@@ -72,4 +70,7 @@ public class AmazonS3Service {
     private boolean validateFileExists(MultipartFile multipartFile) {
         return multipartFile.isEmpty();
     } //빈 파일인지 확인, 실제있는 파일인지 확인
+
+
+
 }

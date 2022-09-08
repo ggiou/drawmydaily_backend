@@ -19,7 +19,7 @@ public class PostResponseDto {
     private String date;
     private String content;
     private String sayMe;
-    private String image;
+    private String imageURL;
     private List<CommentResponseDto> commentResponseDtoList;
     //게시글 detail 페이지에 댓글 리스트도 출력
     private LocalDateTime createdAt; //작성시간

@@ -1,5 +1,6 @@
 package sparta.drawmydaily_backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,7 +24,7 @@ public class Post extends Timestamped{
     @Column(nullable = false)
     private String title; //제목
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT", length = 2000, nullable = false)
     private String content; //작성 글 내용
 
     @Column(nullable = false)
@@ -32,25 +33,29 @@ public class Post extends Timestamped{
     @Column(nullable = false)
     private String sayMe; //나에게 할 말
 
-    @OneToOne
-    private ImageMapper image; // 이미지
+    @Column(nullable = false)
+    private String imageURL; // 이미지
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments; //댓글리스트
 
+    @JsonIgnore
     @JoinColumn(name = "users_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Users users; //회원가입 된 유저
+
+
 
     public boolean validateUser(Users users) {
         return !this.users.equals(users);
     }
     ////작성자 확인
 
-    public void update(PostRequestDto postRequestDto, ImageMapper image) {
+    public void update(PostRequestDto postRequestDto, String imageURL, Users users) {
         this.title = postRequestDto.getTitle();
         this.date = postRequestDto.getDate();
-        this.image = image;
+        this.users = users;
+        this.imageURL = imageURL;
         this.content = postRequestDto.getContent();
         this.sayMe = postRequestDto.getSayMe();
     }
@@ -66,5 +71,7 @@ public class Post extends Timestamped{
         comment.setPost(this);
     }
     //게시글에 댓글 삭제시 댓글리스트에서 제거
+
+
 
 }

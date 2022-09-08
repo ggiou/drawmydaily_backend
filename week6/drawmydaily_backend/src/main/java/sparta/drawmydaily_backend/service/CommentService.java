@@ -42,10 +42,15 @@ public class CommentService {
             return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
         } //user가 유효한지 확인 = 로그인된 회원 확인
 
-        Post post = postService.isPresentPost(requestDto.getParentId());
+        Post post = postService.isPresentPost(requestDto.getPostId());
         if (null == post){
             return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
         } //해당 id의 게시글 없으면 오류 발생
+
+        int strlenComment = requestDto.getContent().length();
+        if (strlenComment>50){
+            return ResponseDto.fail("COMMENT_CONTETN_LENGTH", "댓글 내용은 50자 이상 입력하실수 없습니다.");
+        }
 
         Comment comment = Comment.builder()
                 .users(users)
@@ -57,6 +62,7 @@ public class CommentService {
         return ResponseDto.success(
                 CommentResponseDto.builder()
                         .id(comment.getId())
+                        .postId(comment.getPost().getId())
                         .user_name(comment.getUsers().getName())
                         .content(comment.getContent())
                         .createdAt(comment.getCreatedAt())
@@ -90,6 +96,56 @@ public class CommentService {
         return ResponseDto.success(commentResponseDtoList);
     }
     //id의 게시글의 댓글 전체 가져오기
+
+    public ResponseDto<?> updateComment(Long id, CommentRequestDto requestDto, HttpServletRequest request) {
+        if (null == request.getHeader("RefreshToken")) {
+            return ResponseDto.fail("MEMBER_NOT_FOUND",
+                    "로그인이 필요합니다.");
+        }
+
+        if (null == request.getHeader("Authorization")) {
+            return ResponseDto.fail("MEMBER_NOT_FOUND",
+                    "로그인이 필요합니다.");
+        }
+
+        Users users = validateUser(request);
+        if (null == users) {
+            return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
+        }
+
+        Post post = postService.isPresentPost(requestDto.getPostId());
+        if (null == post) {
+            return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
+        }
+
+        Comment comment = isPresentComment(id);
+        if (null == comment) {
+            return ResponseDto.fail("NOT_FOUND", "존재하지 않는 댓글 id 입니다.");
+        }
+
+        if (comment.validateUser(users)) {
+            return ResponseDto.fail("BAD_REQUEST", "작성자만 수정할 수 있습니다.");
+        }
+
+        int strlenComment = requestDto.getContent().length();
+        if (strlenComment>50){
+            return ResponseDto.fail("COMMENT_CONTETN_LENGTH", "댓글 내용은 50자 이상 입력하실수 없습니다.");
+        } // 댓글 길이 제한
+
+        comment.update(requestDto,post);
+
+        return ResponseDto.success(
+                CommentResponseDto.builder()
+                        .postId(comment.getPost().getId())
+                        .id(comment.getId())
+                        .user_name(comment.getUsers().getName())
+                        .content(comment.getContent())
+                        .createdAt(comment.getCreatedAt())
+                        .modifiedAt(comment.getModifiedAt())
+                        .build()
+        );
+    }
+    //id의 댓글 수정
 
     @Transactional
     public ResponseDto<?> deleteComment(Long id, HttpServletRequest request) {
@@ -142,5 +198,6 @@ public class CommentService {
         }
         return tokenProvider.getUserFromAuthentication();
     }   //유효하면 인증 완료
+
 
 }

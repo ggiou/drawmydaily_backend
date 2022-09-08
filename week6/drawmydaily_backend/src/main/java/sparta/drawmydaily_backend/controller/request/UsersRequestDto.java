@@ -3,23 +3,26 @@ package sparta.drawmydaily_backend.controller.request;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Getter
+@Setter
+
 @NoArgsConstructor
 @AllArgsConstructor
 public class UsersRequestDto {
     @NotBlank
-    //@Size(min = 4, max = 12) //이름(아이디)는 4자 이상 12자이네
-    //@Pattern(regexp = "[a-zA-Z\\d]*${3,12}") //최소 4자 이상, 12자 이하 알파벳 대소문자(a~z, A~Z), 숫자(0~9)로 구성
+    @Size(min = 3, max = 12 )
+    @Pattern(regexp = "[a-z\\d]*${3,12}", message = "아이디는 최소 3글자 이상 12자 이하의 소문자와 숫자로만 이루어져야 합니다.")
     private String name;
 
     @NotBlank
-    //@Size(min = 4, max = 32) //비밀번호는 4자 이상, 32이자 이네
-    //@Pattern(regexp = "[a-z\\d]*${3,32}") //최소 4자 이상이며, 32자 이하 알파벳 소문자(a~z), 숫자(0~9)
+    @Size(min = 3, max = 20)
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{3,20}$",message = "비밀번호는 최소 3글자 이상 20자 이하며 하나의 대소문자와 숫자가 포함되야 합니다.")
     private String password;
 
     @NotBlank

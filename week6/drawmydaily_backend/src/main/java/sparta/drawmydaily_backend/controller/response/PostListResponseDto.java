@@ -15,9 +15,10 @@ public class PostListResponseDto {
     private Long id;
     private String title;
     private String date;
-    private String sayme;
+    private String sayMe;
     private String user_name;
-    private String image;
+    private String imageURL;
+    private String content;
 
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;

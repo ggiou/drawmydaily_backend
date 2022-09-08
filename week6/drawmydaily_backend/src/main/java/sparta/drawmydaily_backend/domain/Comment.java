@@ -1,6 +1,8 @@
 package sparta.drawmydaily_backend.domain;
 
 import lombok.*;
+import sparta.drawmydaily_backend.controller.request.CommentRequestDto;
+import sparta.drawmydaily_backend.repository.PostRepository;
 
 import javax.persistence.*;
 
@@ -27,8 +29,12 @@ public class Comment extends Timestamped{
     @ManyToOne(fetch = FetchType.LAZY)
     private Post post; //작성하는 댓글이 어느 게시글 댓글인지
 
-
     public boolean validateUser(Users users) {
         return !this.users.equals(users);
+    }
+
+    public void update(CommentRequestDto requestDto, Post post) {
+        this.post = post;
+        this.content = requestDto.getContent();
     }
 }

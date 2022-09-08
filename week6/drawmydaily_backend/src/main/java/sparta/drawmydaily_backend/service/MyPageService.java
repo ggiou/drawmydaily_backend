@@ -54,7 +54,7 @@ public class MyPageService {
                             .date(post.getDate())
                             .user_name(post.getUsers().getName())
                             .sayMe(post.getSayMe())
-                            .image(post.getImage().getUrl())
+                            .imageURL(post.getImageURL())
                             .createdAt(post.getCreatedAt())
                             .modifiedAt(post.getModifiedAt())
                             .build()
